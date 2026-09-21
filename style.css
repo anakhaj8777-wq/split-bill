@@ -1,0 +1,295 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #fff5f8;
+    color: #4a2633;
+}
+
+header {
+    background: #f7b6cf;
+    padding: 25px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+header p {
+    margin: 6px 0 0;
+}
+
+main {
+    width: 95%;
+    max-width: 1200px;
+    margin: 25px auto;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    margin-bottom: 22px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+    margin-top: 0;
+    color: #c94f7c;
+}
+
+label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5b4c7;
+    border-radius: 8px;
+    font-size: 15px;
+    background: white;
+}
+
+.people-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.people-grid input {
+    margin: 0;
+}
+
+.expense-members {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.member-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px;
+    margin: 0;
+    background: #fff0f6;
+    border: 1px solid #f0bfd2;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.member-checkbox input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.member-checkbox span {
+    font-weight: normal;
+}
+
+button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px;
+    border: none;
+    border-radius: 9px;
+    background: #d96b96;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #c75582;
+}
+
+.expense-category {
+    margin-bottom: 25px;
+    border: 1px solid #f0c3d3;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.category-header {
+    background: #ffdce9;
+    padding: 12px 16px;
+}
+
+.category-header h3 {
+    margin: 0;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.category-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.category-table th,
+.category-table td {
+    padding: 10px;
+    border: 1px solid #efd1dc;
+    text-align: center;
+}
+
+.category-table th {
+    background: #fff0f5;
+}
+
+.category-table tfoot td {
+    font-weight: bold;
+    background: #ffe6ef;
+}
+
+.delete-btn {
+    width: auto;
+    margin: 0;
+    padding: 7px 12px;
+    background: #dc6b83;
+    font-size: 13px;
+}
+
+.payment-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    margin-top: 10px;
+    background: #fff0f6;
+    border-radius: 8px;
+}
+
+.payment-row .delete-btn {
+    margin: 0;
+}
+
+.balance-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 14px;
+    margin-bottom: 8px;
+    background: #fff0f6;
+    border-radius: 8px;
+    align-items: center;
+}
+
+.receive {
+    color: #16834a;
+    font-weight: bold;
+}
+
+.pay {
+    color: #c0392b;
+    font-weight: bold;
+}
+
+.settled {
+    color: #777;
+    font-weight: bold;
+}
+
+.category-settlement {
+    padding: 16px;
+    background: #fff7fa;
+    border-top: 1px solid #f0c3d3;
+}
+
+.category-settlement h4 {
+    margin: 0 0 12px;
+    color: #c94f7c;
+    font-size: 18px;
+}
+
+.settlement-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #fff0f6;
+    border-radius: 10px;
+}
+
+.settlement-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    margin-top: 12px;
+    background: #ffe6ef;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.category-empty {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+}
+
+@media (max-width: 700px) {
+
+    main {
+        width: 92%;
+    }
+
+    .people-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .expense-members {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .payment-row {
+        grid-template-columns: 1fr;
+    }
+
+    .balance-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .settlement-row {
+        flex-wrap: wrap;
+    }
+
+    .settlement-total {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 450px) {
+
+    .people-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .expense-members {
+        grid-template-columns: 1fr;
+    }
+
+    header h1 {
+        font-size: 26px;
+    }
+}
