@@ -1,3 +1,4 @@
+
 const categories = [
     "Grocery",
     "Food",
@@ -22,17 +23,54 @@ let members = [
 
 let expenses = [];
 let payments = [];
+async function loadMembersFromSupabase() {
+    const { data, error } = await supabase
+        .from("members")
+        .select("id, name")
+        .order("id");
 
-document.addEventListener("DOMContentLoaded", function () {
+    if (error) {
+        console.error("Error loading members:", error);
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        console.log("No members found in Supabase.");
+        return;
+    }
+
+    const inputs =
+        document.querySelectorAll(".member-name");
+
+    data.forEach(function (member, index) {
+
+        if (inputs[index]) {
+            inputs[index].value = member.name;
+        }
+
+        members[index] = member.name;
+    });
+
+    updateExpenseMembers();
+    updatePaymentDropdown();
+    displayExpenses();
+    displayPayments();
+    calculateBalances();
+
+    console.log("Members loaded from Supabase:", data);
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
     setupMemberInputs();
-    updateMembers();
+
+    await loadMembersFromSupabase();
+
     updateExpenseMembers();
     updatePaymentDropdown();
     displayExpenses();
     displayPayments();
     calculateBalances();
 });
-
 function setupMemberInputs() {
     const inputs =
         document.querySelectorAll(".member-name");
@@ -66,9 +104,6 @@ function updateMembers() {
 
         if (name !== "") {
             members[index] = name;
-        } else {
-            members[index] =
-                "Person " + (index + 1);
         }
     });
 }
