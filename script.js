@@ -68,10 +68,55 @@ async function loadMembersFromSupabase() {
 
     console.log("Members loaded:", memberRecords);
 }
+async function loadExpensesFromSupabase() {
+    const { data, error } = await db
+        .from("expenses")
+        .select("*")
+        .eq("room_id", ROOM_ID)
+        .order("id");
+
+    if (error) {
+        console.error("Error loading expenses:", error);
+        return;
+    }
+
+    expenses = [];
+
+    data.forEach(function (expense) {
+        const selectedIndexes = [];
+
+        if (Array.isArray(expense.shared_member_ids)) {
+            expense.shared_member_ids.forEach(function (memberId) {
+                const index = memberRecords.findIndex(function (member) {
+                    return Number(member.id) === Number(memberId);
+                });
+
+                if (index !== -1) {
+                    selectedIndexes.push(index);
+                }
+            });
+        }
+
+        expenses.push({
+            id: expense.id,
+            type: expense.category,
+            description: expense.item,
+            amount: Number(expense.amount),
+            members: selectedIndexes
+        });
+    });
+
+    displayExpenses();
+    calculateBalances();
+
+    console.log("Expenses loaded from Supabase:", expenses);
+}
 document.addEventListener("DOMContentLoaded", async function () {
     setupMemberInputs();
 
     await loadMembersFromSupabase();
+
+    await loadExpensesFromSupabase();
 
     updateExpenseMembers();
     updatePaymentDropdown();
