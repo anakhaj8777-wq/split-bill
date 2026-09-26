@@ -793,7 +793,6 @@ async function addPayment() {
                 category: category,
                 amount: amount,
                 paid_by: paidByMemberId,
-                expense_date: new Date().toISOString().split("T")[0],
                 shared_member_ids: []
             }
         ])
