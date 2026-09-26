@@ -790,7 +790,6 @@ async function addPayment() {
         .insert([
             {
                 room_id: ROOM_ID,
-                item: "Actual Payment",
                 category: category,
                 amount: amount,
                 paid_by: paidByMemberId,
