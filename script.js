@@ -105,11 +105,44 @@ async function loadExpensesFromSupabase() {
             members: selectedIndexes
         });
     });
+    
 
     displayExpenses();
     calculateBalances();
 
     console.log("Expenses loaded from Supabase:", expenses);
+}
+async function loadPaymentsFromSupabase() {
+    const { data, error } = await db
+        .from("payments")
+        .select("*")
+        .eq("room_id", ROOM_ID)
+        .order("id");
+
+    if (error) {
+        console.error("Payment loading error:", error);
+        return;
+    }
+
+    payments = [];
+
+    data.forEach(payment => {
+        const paidByIndex = memberRecords.findIndex(
+            member => Number(member.id) === Number(payment.paid_by)
+        );
+
+        if (paidByIndex !== -1) {
+            payments.push({
+                id: payment.id,
+                paidBy: paidByIndex,
+                category: payment.category,
+                amount: Number(payment.amount)
+            });
+        }
+    });
+
+    displayPayments();
+    calculateBalances();
 }
 document.addEventListener("DOMContentLoaded", async function () {
     setupMemberInputs();
@@ -117,7 +150,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     await loadMembersFromSupabase();
 
     await loadExpensesFromSupabase();
-
+    await loadPaymentsFromSupabase(); 
     updateExpenseMembers();
     updatePaymentDropdown();
     displayExpenses();
