@@ -17,7 +17,9 @@ const categories = [
     "Gas",
     "Other"
 ];
+const ROOM_ID = 4;
 
+let memberRecords = [];
 let members = [
     "Person 1",
     "Person 2",
@@ -31,40 +33,31 @@ let expenses = [];
 let payments = [];
 async function loadMembersFromSupabase() {
     const { data, error } = await db
-    .from("members")
+        .from("members")
         .select("id, name")
+        .eq("room_id", ROOM_ID)
         .order("id");
 
     if (error) {
-        console.error("SUPABASE ERROR:", error);
-        alert("Could not load names from Supabase. Open Console to see the error.");
+        console.error("Error loading members:", error);
         return;
     }
-
-    console.log("SUPABASE MEMBERS:", data);
 
     if (!data || data.length === 0) {
-        alert("No members found in the Supabase members table.");
+        console.log("No members found in Supabase.");
         return;
     }
+
+    memberRecords = data;
 
     const inputs = document.querySelectorAll(".member-name");
 
-    members = [
-        "Person 1",
-        "Person 2",
-        "Person 3",
-        "Person 4",
-        "Person 5",
-        "Person 6"
-    ];
-
-    data.slice(0, 6).forEach(function(member, index) {
-        members[index] = member.name;
-
+    data.forEach(function (member, index) {
         if (inputs[index]) {
             inputs[index].value = member.name;
         }
+
+        members[index] = member.name;
     });
 
     updateExpenseMembers();
@@ -73,7 +66,7 @@ async function loadMembersFromSupabase() {
     displayPayments();
     calculateBalances();
 
-    console.log("Names loaded successfully:", members);
+    console.log("Members loaded:", memberRecords);
 }
 document.addEventListener("DOMContentLoaded", async function () {
     setupMemberInputs();
@@ -163,27 +156,12 @@ function updatePaymentDropdown() {
     }
 }
 
-function addExpense() {
+async function addExpense() {
     updateMembers();
 
-    const type =
-        document.getElementById(
-            "expenseType"
-        ).value;
-
-    const description =
-        document
-            .getElementById(
-                "expenseDescription"
-            )
-            .value.trim();
-
-    const amount =
-        parseFloat(
-            document.getElementById(
-                "expenseAmount"
-            ).value
-        );
+    const type = document.getElementById("expenseType").value;
+    const description = document.getElementById("expenseDescription").value.trim();
+    const amount = parseFloat(document.getElementById("expenseAmount").value);
 
     if (type === "") {
         alert("Please select an expense type.");
@@ -200,49 +178,67 @@ function addExpense() {
         return;
     }
 
-    const selectedMembers = [];
+    const selectedIndexes = [];
 
-    document
-        .querySelectorAll(".expense-member")
-        .forEach(function (checkbox) {
-            if (checkbox.checked) {
-                selectedMembers.push(
-                    parseInt(checkbox.value)
-                );
-            }
-        });
+    document.querySelectorAll(".expense-member").forEach(function (checkbox) {
+        if (checkbox.checked) {
+            selectedIndexes.push(parseInt(checkbox.value));
+        }
+    });
 
-    if (selectedMembers.length === 0) {
+    if (selectedIndexes.length === 0) {
         alert("Please select at least one person.");
         return;
     }
 
-    expenses.push({
-        id: Date.now(),
-        type: type,
-        description: description,
-        amount: amount,
-        members: selectedMembers
+    const selectedMemberIds = selectedIndexes.map(function (index) {
+        return memberRecords[index].id;
     });
 
-    document.getElementById(
-        "expenseDescription"
-    ).value = "";
+    const { data, error } = await db
+        .from("expenses")
+        .insert([
+            {
+                room_id: ROOM_ID,
+                item: description,
+                category: type,
+                amount: amount,
+                paid_by: null,
+                expense_date: new Date().toISOString().split("T")[0],
+                shared_member_ids: selectedMemberIds
+            }
+        ])
+        .select()
+        .single();
 
-    document.getElementById(
-        "expenseAmount"
-    ).value = "";
+    if (error) {
+        console.error("Error saving expense:", error);
+        alert("Expense could not be saved. Check the browser console.");
+        return;
+    }
 
-    document
-        .querySelectorAll(".expense-member")
-        .forEach(function (checkbox) {
-            checkbox.checked = false;
-        });
+    console.log("Expense saved to Supabase:", data);
+
+    const newExpense = {
+        id: data.id,
+        type: data.category,
+        description: data.item,
+        amount: Number(data.amount),
+        members: selectedIndexes
+    };
+
+    expenses.push(newExpense);
+
+    document.getElementById("expenseDescription").value = "";
+    document.getElementById("expenseAmount").value = "";
+
+    document.querySelectorAll(".expense-member").forEach(function (checkbox) {
+        checkbox.checked = false;
+    });
 
     displayExpenses();
     calculateBalances();
 }
-
 function deleteExpense(id) {
     expenses =
         expenses.filter(function (expense) {
