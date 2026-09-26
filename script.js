@@ -802,10 +802,14 @@ async function addPayment() {
         .single();
 
     if (error) {
-        console.error("Error saving payment:", error);
-        alert("Payment could not be saved. Check the browser console.");
-        return;
-    }
+    console.error("Payment error code:", error.code);
+    console.error("Payment error message:", error.message);
+    console.error("Payment error details:", error.details);
+    console.error("Payment error hint:", error.hint);
+
+    alert("Payment could not be saved. Open Console and check the error.");
+    return;
+}
 
     console.log("Payment saved to Supabase:", data);
 
