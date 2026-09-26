@@ -753,30 +753,22 @@ function createCategorySettlement(category) {
     return section;
 }
 
-function addPayment() {
-
+async function addPayment() {
     updateMembers();
 
-    const paidBy =
-        parseInt(
-            document.getElementById(
-                "paidBy"
-            ).value
-        );
+    const paidByIndex = parseInt(
+        document.getElementById("paidBy").value
+    );
 
     const category =
-        document.getElementById(
-            "paymentCategory"
-        ).value;
+        document.getElementById("paymentCategory").value;
 
     const amount =
         parseFloat(
-            document.getElementById(
-                "paymentAmount"
-            ).value
+            document.getElementById("paymentAmount").value
         );
 
-    if (isNaN(paidBy)) {
+    if (isNaN(paidByIndex)) {
         alert("Please select who paid.");
         return;
     }
@@ -791,16 +783,40 @@ function addPayment() {
         return;
     }
 
+    const paidByMemberId = memberRecords[paidByIndex].id;
+
+    const { data, error } = await db
+        .from("payments")
+        .insert([
+            {
+                room_id: ROOM_ID,
+                item: "Actual Payment",
+                category: category,
+                amount: amount,
+                paid_by: paidByMemberId,
+                expense_date: new Date().toISOString().split("T")[0],
+                shared_member_ids: []
+            }
+        ])
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error saving payment:", error);
+        alert("Payment could not be saved. Check the browser console.");
+        return;
+    }
+
+    console.log("Payment saved to Supabase:", data);
+
     payments.push({
-        id: Date.now(),
-        paidBy: paidBy,
-        category: category,
-        amount: amount
+        id: data.id,
+        paidBy: paidByIndex,
+        category: data.category,
+        amount: Number(data.amount)
     });
 
-    document.getElementById(
-        "paymentAmount"
-    ).value = "";
+    document.getElementById("paymentAmount").value = "";
 
     displayPayments();
     displayExpenses();
