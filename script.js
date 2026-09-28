@@ -31,6 +31,7 @@ let members = [
 
 let expenses = [];
 let payments = [];
+let paybacks = [];
 async function loadMembersFromSupabase() {
     const { data, error } = await db
         .from("members")
@@ -98,12 +99,13 @@ async function loadExpensesFromSupabase() {
         }
 
         expenses.push({
-            id: expense.id,
-            type: expense.category,
-            description: expense.item,
-            amount: Number(expense.amount),
-            members: selectedIndexes
-        });
+    id: expense.id,
+    type: expense.category,
+    description: expense.item,
+    amount: Number(expense.amount),
+    members: selectedIndexes,
+    date: expense.expense_date
+});
     });
     
 
@@ -133,16 +135,183 @@ async function loadPaymentsFromSupabase() {
 
         if (paidByIndex !== -1) {
             payments.push({
-                id: payment.id,
-                paidBy: paidByIndex,
-                category: payment.category,
-                amount: Number(payment.amount)
+            id: payment.id,
+            paidBy: paidByIndex,
+            category: payment.category,
+            amount: Number(payment.amount),
+            date: payment.payment_date
             });
         }
     });
 
     displayPayments();
     calculateBalances();
+}
+async function loadPaybacksFromSupabase() {
+
+    const { data, error } = await db
+        .from("paybacks")
+        .select("*")
+        .eq("room_id", ROOM_ID)
+        .order("id");
+
+    if (error) {
+        console.error("Payback loading error:", error);
+        return;
+    }
+
+    paybacks = data || [];
+
+    console.log("Paybacks loaded from Supabase:", paybacks);
+}
+async function savePaybackStatus(debtorIndex, creditorIndex, category, amount, status) {
+
+    const debtorId = memberRecords[debtorIndex].id;
+    const creditorId = memberRecords[creditorIndex].id;
+
+    // Look for an existing payback record
+    const existing = paybacks.find(function (payback) {
+
+        return (
+            Number(payback.debtor_id) === Number(debtorId) &&
+            Number(payback.creditor_id) === Number(creditorId) &&
+            payback.category === category &&
+            Math.abs(Number(payback.amount) - Number(amount)) < 0.01
+        );
+
+    });
+
+    if (existing) {
+
+        const { data, error } = await db
+            .from("paybacks")
+            .update({
+                status: status,
+                cleared_at:
+                    status === "Cleared"
+                        ? new Date().toISOString()
+                        : null
+            })
+            .eq("id", existing.id)
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Error updating payback:", error);
+            alert("Payback status could not be updated.");
+            return;
+        }
+
+        const index =
+            paybacks.findIndex(function (item) {
+                return item.id === existing.id;
+            });
+
+        if (index !== -1) {
+            paybacks[index] = data;
+        }
+
+    } else {
+
+        const { data, error } = await db
+            .from("paybacks")
+            .insert([
+                {
+                    room_id: ROOM_ID,
+                    debtor_id: debtorId,
+                    creditor_id: creditorId,
+                    category: category,
+                    amount: amount,
+                    status: status,
+                    cleared_at:
+                        status === "Cleared"
+                            ? new Date().toISOString()
+                            : null
+                }
+            ])
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Error saving payback:", error);
+            alert("Payback status could not be saved.");
+            return;
+        }
+
+        paybacks.push(data);
+    }
+
+    displayExpenses();
+}
+async function clearAllPaybacks() {
+
+    const confirmClear = confirm(
+        "Are you sure you want to delete all payback records?"
+    );
+
+    if (!confirmClear) {
+        return;
+    }
+
+    const { error } = await db
+        .from("paybacks")
+        .delete()
+        .eq("room_id", ROOM_ID);
+
+    if (error) {
+        console.error("Error clearing paybacks:", error);
+        alert("Paybacks could not be cleared.");
+        return;
+    }
+
+    paybacks = [];
+
+    displayExpenses();
+    displayMonthlyStatistics();
+
+    const reminderList =
+        document.getElementById("reminderList");
+
+    if (reminderList) {
+        reminderList.textContent =
+            "No pending reminders yet.";
+    }
+
+    alert("All payback records have been cleared.");
+}
+function getPaybackStatus(
+    debtorIndex,
+    creditorIndex,
+    category,
+    amount
+) {
+
+    const debtorId =
+        memberRecords[debtorIndex].id;
+
+    const creditorId =
+        memberRecords[creditorIndex].id;
+
+    const existing =
+        paybacks.find(function (payback) {
+
+            return (
+                Number(payback.debtor_id) === Number(debtorId) &&
+                Number(payback.creditor_id) === Number(creditorId) &&
+                payback.category === category &&
+                Math.abs(
+                    Number(payback.amount) -
+                    Number(amount)
+                ) < 0.01
+            );
+
+        });
+
+    if (!existing) {
+        return "Pending";
+    }
+
+    return existing.status;
 }
 document.addEventListener("DOMContentLoaded", async function () {
     setupMemberInputs();
@@ -151,11 +320,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     await loadExpensesFromSupabase();
     await loadPaymentsFromSupabase(); 
+    await loadPaybacksFromSupabase();
     updateExpenseMembers();
     updatePaymentDropdown();
     displayExpenses();
     displayPayments();
     calculateBalances();
+    setupStatistics();
 });
 
 function updateMembers() {
@@ -217,6 +388,15 @@ function setupMemberInputs() {
     document
         .getElementById("addPayment")
         .addEventListener("click", addPayment);
+    document
+    .getElementById("clearPayments")
+    .addEventListener("click", clearAllPayments);  
+    document
+    .getElementById("clearExpenses")
+    .addEventListener("click", clearAllExpenses); 
+    document
+    .getElementById("clearPaybacks")
+    .addEventListener("click", clearAllPaybacks);
 } 
 
 function updateExpenseMembers() {
@@ -323,11 +503,12 @@ async function addExpense() {
     console.log("Expense saved to Supabase:", data);
 
     const newExpense = {
-        id: data.id,
-        type: data.category,
-        description: data.item,
-        amount: Number(data.amount),
-        members: selectedIndexes
+    id: data.id,
+    type: data.category,
+    description: data.item,
+    amount: Number(data.amount),
+    members: selectedIndexes,
+    date: data.expense_date
     };
 
     expenses.push(newExpense);
@@ -363,6 +544,47 @@ async function deleteExpense(id) {
     calculateBalances();
 }
 
+async function clearAllExpenses() {
+
+    const confirmClear = confirm(
+        "Are you sure you want to delete all expenses and payback records?"
+    );
+
+    if (!confirmClear) {
+        return;
+    }
+
+    const { error: expenseError } = await db
+        .from("expenses")
+        .delete()
+        .eq("room_id", ROOM_ID);
+
+    if (expenseError) {
+        console.error("Error clearing expenses:", expenseError);
+        alert("Expenses could not be cleared.");
+        return;
+    }
+
+    const { error: paybackError } = await db
+        .from("paybacks")
+        .delete()
+        .eq("room_id", ROOM_ID);
+
+    if (paybackError) {
+        console.error("Error clearing paybacks:", paybackError);
+        alert("Expenses were cleared, but paybacks could not be cleared.");
+        return;
+    }
+
+    expenses = [];
+    paybacks = [];
+
+    displayExpenses();
+    calculateBalances();
+    displayMonthlyStatistics();
+
+    alert("All expenses and payback records have been cleared.");
+}
 function displayExpenses() {
     const container =
         document.getElementById(
@@ -647,124 +869,127 @@ function createCategoryTable(categoryExpenses) {
 
 function createCategorySettlement(category) {
 
-    const section =
-        document.createElement("div");
+    const section = document.createElement("div");
+    section.className = "category-settlement";
 
-    section.className =
-        "category-settlement";
-
-    const title =
-        document.createElement("h4");
-
-    title.textContent =
-        "Who Pays Whom?";
-
+    const title = document.createElement("h4");
+    title.textContent = "Who Pays Whom?";
     section.appendChild(title);
 
-    const categoryExpenses =
-        expenses.filter(function (expense) {
-            return expense.type === category;
-        });
+    const categoryExpenses = expenses.filter(function (expense) {
+        return expense.type === category;
+    });
 
-    const shouldPay =
+    if (categoryExpenses.length === 0) {
+        return section;
+    }
+
+    const personShares =
         new Array(members.length).fill(0);
 
-    const actuallyPaid =
-        new Array(members.length).fill(0);
+    let categoryTotal = 0;
 
     categoryExpenses.forEach(function (expense) {
 
-        const unitPrice =
-            expense.amount /
-            expense.members.length;
+        if (
+            !expense.members ||
+            expense.members.length === 0
+        ) {
+            return;
+        }
 
-        expense.members.forEach(
-            function (memberIndex) {
-                shouldPay[memberIndex] +=
-                    unitPrice;
-            }
-        );
+        const unitPrice =
+            expense.amount / expense.members.length;
+
+        categoryTotal += expense.amount;
+
+        expense.members.forEach(function (memberIndex) {
+            personShares[memberIndex] += unitPrice;
+        });
     });
 
-    payments
-        .filter(function (payment) {
+    const categoryPayments =
+        payments.filter(function (payment) {
             return payment.category === category;
-        })
-        .forEach(function (payment) {
-            actuallyPaid[payment.paidBy] +=
-                payment.amount;
         });
 
-    const balances =
-        new Array(members.length).fill(0);
+    if (categoryPayments.length === 0) {
 
-    members.forEach(function (member, index) {
-
-        balances[index] =
-            actuallyPaid[index] -
-            shouldPay[index];
-    });
-
-    const creditors = [];
-    const debtors = [];
-
-    balances.forEach(function (balance, index) {
-
-        if (balance > 0.005) {
-            creditors.push({
-                index: index,
-                amount: balance
-            });
-        }
-
-        if (balance < -0.005) {
-            debtors.push({
-                index: index,
-                amount: Math.abs(balance)
-            });
-        }
-    });
-
-    let settlementTotal = 0;
-
-    if (
-        creditors.length === 0 &&
-        debtors.length === 0
-    ) {
-
-        const empty =
+        const message =
             document.createElement("div");
 
-        empty.className =
-            "category-empty";
+        message.className = "category-empty";
 
-        empty.textContent =
-            "Everyone is settled.";
+        message.textContent =
+            "Add the payment for this category to calculate who pays whom.";
 
-        section.appendChild(empty);
+        section.appendChild(message);
 
         return section;
     }
 
-    let debtorIndex = 0;
-    let creditorIndex = 0;
+    const paidAmounts =
+        new Array(members.length).fill(0);
 
-    while (
-        debtorIndex < debtors.length &&
-        creditorIndex < creditors.length
-    ) {
+    categoryPayments.forEach(function (payment) {
 
-        const debtor =
-            debtors[debtorIndex];
+        paidAmounts[payment.paidBy] +=
+            Number(payment.amount);
 
-        const creditor =
-            creditors[creditorIndex];
+    });
 
-        const amount =
-            Math.min(
-                debtor.amount,
-                creditor.amount
-            );
+    let mainPayerIndex = -1;
+    let highestPayment = 0;
+
+    paidAmounts.forEach(function (amount, index) {
+
+        if (amount > highestPayment) {
+            highestPayment = amount;
+            mainPayerIndex = index;
+        }
+
+    });
+
+    if (mainPayerIndex === -1) {
+        return section;
+    }
+
+    const payerInfo =
+        document.createElement("div");
+
+    payerInfo.className =
+        "settlement-row";
+
+    payerInfo.innerHTML = `
+        <strongconst payment>
+            ${members[mainPayerIndex]}
+        </strong>
+
+        <span>
+            paid the total
+        </span>
+
+        <strong>
+            AED ${highestPayment.toFixed(2)}
+        </strong>
+    `;
+
+    section.appendChild(payerInfo);
+
+    let settlementTotal = 0;
+
+    members.forEach(function (member, index) {
+
+        if (index === mainPayerIndex) {
+            return;
+        }
+
+        const amountOwed =
+            personShares[index];
+
+        if (amountOwed <= 0.005) {
+            return;
+        }
 
         const row =
             document.createElement("div");
@@ -772,37 +997,69 @@ function createCategorySettlement(category) {
         row.className =
             "settlement-row";
 
+        const status =
+            getPaybackStatus(
+                index,
+                mainPayerIndex,
+                category,
+                amountOwed
+            );
+
+        const statusButton =
+            document.createElement("button");
+
+        statusButton.textContent = status;
+
+        statusButton.className =
+            status === "Cleared"
+                ? "payback-cleared-btn"
+                : "payback-pending-btn";
+
+        statusButton.addEventListener(
+            "click",
+            async function () {
+
+                statusButton.disabled = true;
+
+                const newStatus =
+                    status === "Cleared"
+                        ? "Pending"
+                        : "Cleared";
+
+                await savePaybackStatus(
+                    index,
+                    mainPayerIndex,
+                    category,
+                    amountOwed,
+                    newStatus
+                );
+
+            }
+        );
+
         row.innerHTML = `
             <strong>
-                ${members[debtor.index]}
+                ${members[index]}
             </strong>
 
             <span>→</span>
 
             <strong>
-                ${members[creditor.index]}
+                ${members[mainPayerIndex]}
             </strong>
 
             <span>
-                AED ${amount.toFixed(2)}
+                AED ${amountOwed.toFixed(2)}
             </span>
         `;
 
+        row.appendChild(statusButton);
+
         section.appendChild(row);
 
-        settlementTotal += amount;
+        settlementTotal += amountOwed;
 
-        debtor.amount -= amount;
-        creditor.amount -= amount;
-
-        if (debtor.amount <= 0.005) {
-            debtorIndex++;
-        }
-
-        if (creditor.amount <= 0.005) {
-            creditorIndex++;
-        }
-    }
+    });
 
     const total =
         document.createElement("div");
@@ -811,13 +1068,63 @@ function createCategorySettlement(category) {
         "settlement-total";
 
     total.innerHTML = `
-        <span>Total</span>
+        <span>
+            Total to ${members[mainPayerIndex]}
+        </span>
+
         <span>
             AED ${settlementTotal.toFixed(2)}
         </span>
     `;
 
     section.appendChild(total);
+
+    const payerOwnShare =
+        personShares[mainPayerIndex];
+
+    const expectedTotal =
+        categoryTotal - payerOwnShare;
+
+    const paymentTotal =
+    categoryPayments.reduce(function (total, payment) {
+        return total + Number(payment.amount);
+    }, 0);
+
+const check =
+    document.createElement("div");
+
+check.className =
+    "settlement-total";
+
+let paymentCheckText = "";
+
+if (Math.abs(paymentTotal - categoryTotal) < 0.01) {
+
+    paymentCheckText =
+        `Payment: ✅ Tally`;
+
+} else if (paymentTotal < categoryTotal) {
+
+    paymentCheckText =
+        `Payment: ⚠️ AED ${(categoryTotal - paymentTotal).toFixed(2)} remaining`;
+
+} else {
+
+    paymentCheckText =
+        `Payment: ⚠️ AED ${(paymentTotal - categoryTotal).toFixed(2)} extra`;
+}
+
+check.innerHTML = `
+    <span>
+        Calculation Check: AED ${expectedTotal.toFixed(2)}
+    </span>
+
+    <span>
+        ${paymentCheckText}
+    </span>
+`;
+
+section.appendChild(check);
 
     return section;
 }
@@ -881,11 +1188,12 @@ async function addPayment() {
     console.log("Payment saved to Supabase:", data);
 
     payments.push({
-        id: data.id,
-        paidBy: paidByIndex,
-        category: data.category,
-        amount: Number(data.amount)
-    });
+    id: data.id,
+    paidBy: paidByIndex,
+    category: data.category,
+    amount: Number(data.amount),
+    date: data.payment_date
+});
 
     document.getElementById("paymentAmount").value = "";
 
@@ -915,6 +1223,36 @@ async function deletePayment(id) {
     displayPayments();
     displayExpenses();
     calculateBalances();
+}
+async function clearAllPayments() {
+
+    const confirmClear = confirm(
+        "Are you sure you want to delete all payments?"
+    );
+
+    if (!confirmClear) {
+        return;
+    }
+
+    const { error } = await db
+        .from("payments")
+        .delete()
+        .eq("room_id", ROOM_ID);
+
+    if (error) {
+        console.error("Error clearing payments:", error);
+        alert("Payments could not be cleared.");
+        return;
+    }
+
+    payments = [];
+
+    displayPayments();
+    displayExpenses();
+    calculateBalances();
+    displayMonthlyStatistics();
+
+    alert("All payments have been cleared.");
 }
 
 function displayPayments() {
@@ -979,7 +1317,269 @@ function displayPayments() {
         container.appendChild(row);
     });
 }
+function setupStatistics() {
 
+    const monthInput =
+        document.getElementById("statisticsMonth");
+
+    if (!monthInput) {
+        return;
+    }
+
+    const today = new Date();
+
+    const currentMonth =
+        today.getFullYear() +
+        "-" +
+        String(today.getMonth() + 1).padStart(2, "0");
+
+    monthInput.value = currentMonth;
+
+    monthInput.addEventListener("change", function () {
+        displayMonthlyStatistics();
+    });
+
+    displayMonthlyStatistics();
+}
+function displayMonthlyStatistics() {
+
+    const monthInput =
+        document.getElementById("statisticsMonth");
+
+    const container =
+        document.getElementById("monthlyStatistics");
+
+    if (!monthInput || !container) {
+        return;
+    }
+
+    const selectedMonth = monthInput.value;
+
+    if (!selectedMonth) {
+        container.innerHTML = `
+            <div class="category-empty">
+                Select a month to view statistics.
+            </div>
+        `;
+        return;
+    }
+
+    const monthlyExpenses = expenses.filter(function (expense) {
+        return expense.date &&
+               expense.date.startsWith(selectedMonth);
+    });
+
+    const monthlyPayments = payments.filter(function (payment) {
+        return payment.date &&
+               payment.date.startsWith(selectedMonth);
+    });
+
+    let totalExpenses = 0;
+
+    monthlyExpenses.forEach(function (expense) {
+        totalExpenses += Number(expense.amount);
+    });
+
+    let totalPayments = 0;
+
+    monthlyPayments.forEach(function (payment) {
+        totalPayments += Number(payment.amount);
+    });
+
+    let categoryTotals = {};
+
+    monthlyExpenses.forEach(function (expense) {
+
+        if (!categoryTotals[expense.type]) {
+            categoryTotals[expense.type] = 0;
+        }
+
+        categoryTotals[expense.type] +=
+            Number(expense.amount);
+    });
+
+    let html = `
+        <div class="statistics-summary">
+
+            <div class="stat-box">
+                <h3>Total Expenses</h3>
+                <p>AED ${totalExpenses.toFixed(2)}</p>
+            </div>
+
+            <div class="stat-box">
+                <h3>Actual Payments</h3>
+                <p>AED ${totalPayments.toFixed(2)}</p>
+            </div>
+
+        </div>
+
+        <h3>Category-wise Expenses</h3>
+    `;
+
+    if (Object.keys(categoryTotals).length === 0) {
+
+        html += `
+            <div class="category-empty">
+                No expenses found for this month.
+            </div>
+        `;
+
+    } else {
+
+        html += `
+            <div class="statistics-table-wrapper">
+                <table class="statistics-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        Object.keys(categoryTotals).forEach(function (category) {
+
+            html += `
+                <tr>
+                    <td>${category}</td>
+                    <td>AED ${categoryTotals[category].toFixed(2)}</td>
+                </tr>
+            `;
+
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    html += `
+    <h3>Person-wise Expense Share</h3>
+
+    <div class="statistics-table-wrapper">
+        <table class="statistics-table">
+            <thead>
+                <tr>
+                    <th>Person</th>
+                    <th>Total Share</th>
+                </tr>
+            </thead>
+            <tbody>
+`;
+
+members.forEach(function (member, index) {
+
+    let personShare = 0;
+
+    monthlyExpenses.forEach(function (expense) {
+
+        if (
+            expense.members &&
+            expense.members.includes(index)
+        ) {
+            const unitPrice =
+                Number(expense.amount) /
+                expense.members.length;
+
+            personShare += unitPrice;
+        }
+
+    });
+
+    html += `
+        <tr>
+            <td>${member}</td>
+            <td>AED ${personShare.toFixed(2)}</td>
+        </tr>
+    `;
+});
+
+html += `
+            </tbody>
+        </table>
+    </div>
+`;
+html += `
+    <h3>Actual Payment by Person</h3>
+
+    <div class="statistics-table-wrapper">
+        <table class="statistics-table">
+            <thead>
+                <tr>
+                    <th>Person</th>
+                    <th>Actual Paid</th>
+                </tr>
+            </thead>
+            <tbody>
+`;
+
+members.forEach(function (member, index) {
+
+    let actualPaid = 0;
+
+    monthlyPayments.forEach(function (payment) {
+
+        if (payment.paidBy === index) {
+            actualPaid += Number(payment.amount);
+        }
+
+    });
+
+    html += `
+        <tr>
+            <td>${member}</td>
+            <td>AED ${actualPaid.toFixed(2)}</td>
+        </tr>
+    `;
+});
+
+html += `
+            </tbody>
+        </table>
+    </div>
+`;
+const monthlyPaybacks = paybacks.filter(function (payback) {
+
+    return payback.created_at &&
+           payback.created_at.startsWith(selectedMonth);
+
+});
+
+let pendingAmount = 0;
+let clearedAmount = 0;
+
+monthlyPaybacks.forEach(function (payback) {
+
+    if (payback.status === "Cleared") {
+        clearedAmount += Number(payback.amount);
+    } else {
+        pendingAmount += Number(payback.amount);
+    }
+
+});
+
+html += `
+    <h3>Payback Status</h3>
+
+    <div class="statistics-summary">
+
+        <div class="stat-box">
+            <h3>Pending</h3>
+            <p>AED ${pendingAmount.toFixed(2)}</p>
+        </div>
+
+        <div class="stat-box">
+            <h3>Cleared</h3>
+            <p>AED ${clearedAmount.toFixed(2)}</p>
+        </div>
+
+    </div>
+`;
+
+    container.innerHTML = html;
+}
 function calculateBalances() {
 
     const shouldPay =
@@ -1095,3 +1695,20 @@ function displayFinalBalances(
         container.appendChild(row);
     });
 }
+const menuButton = document.getElementById("menuButton");
+const sidebar = document.getElementById("sidebar");
+const closeSidebar = document.getElementById("closeSidebar");
+
+menuButton.addEventListener("click", function () {
+    sidebar.classList.add("open");
+});
+
+closeSidebar.addEventListener("click", function () {
+    sidebar.classList.remove("open");
+});
+
+document.querySelectorAll(".sidebar nav a").forEach(function (link) {
+    link.addEventListener("click", function () {
+        sidebar.classList.remove("open");
+    });
+});
