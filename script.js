@@ -158,6 +158,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     calculateBalances();
 });
 
+function updateMembers() {
+    const inputs = document.querySelectorAll(".member-name");
+
+    inputs.forEach(function (input, index) {
+        if (members[index] !== undefined) {
+            members[index] = input.value.trim() || `Person ${index + 1}`;
+        }
+    });
+}
+
 function setupMemberInputs() {
     const inputs =
         document.querySelectorAll(".member-name");
