@@ -317,11 +317,22 @@ async function addExpense() {
     displayExpenses();
     calculateBalances();
 }
-function deleteExpense(id) {
-    expenses =
-        expenses.filter(function (expense) {
-            return expense.id !== id;
-        });
+async function deleteExpense(id) {
+    const { error } = await db
+        .from("expenses")
+        .delete()
+        .eq("id", id)
+        .eq("room_id", ROOM_ID);
+
+    if (error) {
+        console.error("Error deleting expense:", error);
+        alert("Expense could not be deleted.");
+        return;
+    }
+
+    expenses = expenses.filter(function (expense) {
+        return expense.id !== id;
+    });
 
     displayExpenses();
     calculateBalances();
