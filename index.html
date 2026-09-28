@@ -1,703 +1,221 @@
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #fff5f8;
-    color: #4a2633;
-}
-
-/* HOME PAGE */
-
-header {
-    background: #f7b6cf;
-    padding: 25px;
-    text-align: center;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 32px;
-}
-
-header p {
-    margin: 6px 0 0;
-}
-
-main {
-    width: 95%;
-    max-width: 1200px;
-    margin: 25px auto;
-}
-
-/* MENU BUTTON */
-
-.menu-button {
-    position: fixed;
-    top: 18px;
-    left: 18px;
-    z-index: 1000;
-    width: 45px;
-    height: 45px;
-    margin: 0;
-    padding: 0;
-    border: none;
-    border-radius: 10px;
-    background: #d96b96;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.menu-button:hover {
-    background: #c75582;
-}
-
-/* SIDEBAR */
-
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: -270px;
-    width: 260px;
-    height: 100vh;
-    z-index: 2000;
-    background: #f7b6cf;
-    padding: 20px;
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
-    transition: left 0.3s ease;
-    overflow-y: auto;
-}
-
-.sidebar.open {
-    left: 0;
-}
-
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 25px;
-}
-
-.sidebar-header h2 {
-    margin: 0;
-    color: #8f315b;
-    font-size: 21px;
-}
-
-.close-button {
-    width: 35px;
-    height: 35px;
-    margin: 0;
-    padding: 0;
-    border-radius: 8px;
-    font-size: 25px;
-    background: #d96b96;
-}
-
-.sidebar nav a {
-    display: block;
-    text-decoration: none;
-    color: #4a2633;
-    padding: 13px;
-    margin-bottom: 7px;
-    border-radius: 9px;
-    font-weight: bold;
-}
-
-.sidebar nav a:hover {
-    background: #ffdce9;
-    color: #c94f7c;
-}
-
-/* CARDS */
-
-.card {
-    background: white;
-    padding: 22px;
-    margin-bottom: 22px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-}
-
-h2 {
-    margin-top: 0;
-    color: #c94f7c;
-}
-
-label {
-    display: block;
-    margin-top: 14px;
-    margin-bottom: 6px;
-    font-weight: bold;
-}
-
-input,
-select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #e5b4c7;
-    border-radius: 8px;
-    font-size: 15px;
-    background: white;
-}
-
-/* PEOPLE */
-
-.people-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-
-.people-grid input {
-    margin: 0;
-}
-
-/* EXPENSE MEMBERS */
-
-.expense-members {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.member-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 13px;
-    margin: 0;
-    background: #fff0f6;
-    border: 1px solid #f0bfd2;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.member-checkbox input {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    flex-shrink: 0;
-}
-
-.member-checkbox span {
-    font-weight: normal;
-    overflow-wrap: anywhere;
-}
-
-/* BUTTONS */
-
-button {
-    width: 100%;
-    margin-top: 18px;
-    padding: 13px;
-    border: none;
-    border-radius: 9px;
-    background: #d96b96;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #c75582;
-}
-
-/* EXPENSE CATEGORY */
-
-.expense-category {
-    margin-bottom: 25px;
-    border: 1px solid #f0c3d3;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.category-header {
-    background: #ffdce9;
-    padding: 12px 16px;
-}
-
-.category-header h3 {
-    margin: 0;
-}
-
-/* TABLE */
-
-.table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.category-table {
-    width: 100%;
-    min-width: 900px;
-    border-collapse: collapse;
-}
-
-.category-table th,
-.category-table td {
-    padding: 10px;
-    border: 1px solid #efd1dc;
-    text-align: center;
-}
-
-.category-table th {
-    background: #fff0f5;
-}
-
-.category-table tfoot td {
-    font-weight: bold;
-    background: #ffe6ef;
-}
-
-/* DELETE BUTTON */
-
-.delete-btn {
-    width: auto;
-    margin: 0;
-    padding: 7px 12px;
-    background: #dc6b83;
-    font-size: 13px;
-}
-
-.delete-btn:hover {
-    background: #c6536c;
-}
-
-/* PAYMENTS */
-
-.payment-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
-    gap: 10px;
-    align-items: center;
-    padding: 12px;
-    margin-top: 10px;
-    background: #fff0f6;
-    border-radius: 8px;
-}
-
-.payment-row .delete-btn {
-    margin: 0;
-}
-
-/* BALANCE */
-
-.balance-row {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr;
-    gap: 10px;
-    padding: 14px;
-    margin-bottom: 8px;
-    background: #fff0f6;
-    border-radius: 8px;
-    align-items: center;
-}
-
-.receive {
-    color: #16834a;
-    font-weight: bold;
-}
-
-.pay {
-    color: #c0392b;
-    font-weight: bold;
-}
-
-.settled {
-    color: #777;
-    font-weight: bold;
-}
-
-/* CATEGORY SETTLEMENT */
-
-.category-settlement {
-    padding: 16px;
-    background: #fff7fa;
-    border-top: 1px solid #f0c3d3;
-}
-
-.category-settlement h4 {
-    margin: 0 0 12px;
-    color: #c94f7c;
-    font-size: 18px;
-}
-
-.settlement-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    padding: 15px;
-    margin-bottom: 10px;
-    background: #fff0f6;
-    border-radius: 10px;
-}
-
-.settlement-total {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px;
-    margin-top: 12px;
-    background: #ffe6ef;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.category-empty {
-    padding: 20px;
-    text-align: center;
-    color: #888;
-}
-
-/* MOBILE */
-
-@media (max-width: 700px) {
-
-    header {
-        padding: 20px 15px;
-    }
-
-    header h1 {
-        font-size: 27px;
-    }
-
-    header p {
-        font-size: 14px;
-    }
-
-    main {
-        width: 94%;
-        margin: 15px auto;
-    }
-
-    .card {
-        padding: 16px;
-        margin-bottom: 16px;
-        border-radius: 13px;
-    }
-
-    h2 {
-        font-size: 21px;
-    }
-
-    input,
-    select {
-        padding: 11px;
-        font-size: 16px;
-    }
-
-    .people-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 9px;
-    }
-
-    .expense-members {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-
-    .member-checkbox {
-        padding: 11px 9px;
-        gap: 7px;
-        font-size: 14px;
-    }
-
-    .payment-row {
-        grid-template-columns: 1fr;
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .payment-row .delete-btn {
-        width: 100%;
-    }
-
-    .balance-row {
-        grid-template-columns: 1fr;
-        gap: 7px;
-        padding: 12px;
-    }
-
-    .settlement-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .settlement-total {
-        flex-direction: column;
-        gap: 7px;
-        padding: 12px;
-    }
-
-    .category-table {
-        min-width: 820px;
-    }
-
-    .category-table th,
-    .category-table td {
-        padding: 8px;
-        font-size: 13px;
-    }
-
-    .table-wrapper::after {
-        content: "← Swipe left/right to see the full table →";
-        display: block;
-        text-align: center;
-        padding: 8px;
-        font-size: 11px;
-        color: #a56a80;
-        background: #fff7fa;
-    }
-}
-
-/* SMALL PHONES */
-
-@media (max-width: 450px) {
-
-    header {
-        padding: 17px 10px;
-    }
-
-    header h1 {
-        font-size: 23px;
-    }
-
-    header p {
-        font-size: 13px;
-    }
-
-    main {
-        width: 96%;
-        margin: 12px auto;
-    }
-
-    .card {
-        padding: 13px;
-        margin-bottom: 13px;
-        border-radius: 12px;
-    }
-
-    h2 {
-        font-size: 19px;
-    }
-
-    label {
-        font-size: 14px;
-        margin-top: 12px;
-    }
-
-    .people-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 7px;
-    }
-
-    .expense-members {
-        grid-template-columns: 1fr 1fr;
-        gap: 7px;
-    }
-
-    .member-checkbox {
-        padding: 10px 7px;
-        font-size: 13px;
-    }
-
-    .member-checkbox input {
-        width: 16px;
-        height: 16px;
-    }
-
-    .category-table {
-        min-width: 780px;
-    }
-
-    .category-table th,
-    .category-table td {
-        padding: 7px;
-        font-size: 12px;
-    }
-
-    .settlement-row,
-    .settlement-total {
-        font-size: 14px;
-    }
-
-    .delete-btn {
-        padding: 9px 12px;
-        font-size: 13px;
-    }
-}
-.payback-pending-btn,
-.payback-cleared-btn {
-    border: none;
-    padding: 7px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    margin-left: 10px;
-}
-
-.payback-pending-btn {
-    background: #f7b6cf;
-    color: #7a2348;
-}
-
-.payback-cleared-btn {
-    background: #c8e6c9;
-    color: #256029;
-}
-
-.payback-pending-btn:hover,
-.payback-cleared-btn:hover {
-    opacity: 0.85;
-}
-
-.payback-pending-btn:disabled,
-.payback-cleared-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-.settlement-row {
-    display: grid;
-    grid-template-columns: 140px 30px 140px 110px 90px;
-    align-items: center;
-    gap: 10px;
-}
-
-.settlement-row button {
-    width: 80px;
-    text-align: center;
-    margin-left: 0;
-}
-.section-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.section-title h2 {
-    margin: 0;
-}
-
-.clear-all-btn {
-    width: auto;
-    margin: 0;
-    padding: 8px 14px;
-    background: #dc6b83;
-    font-size: 13px;
-}
-
-.clear-all-btn:hover {
-    background: #c75582;
-}
-
-@media (max-width: 500px) {
-    .section-title {
-        align-items: flex-start;
-    }
-
-    .clear-all-btn {
-        padding: 7px 10px;
-        font-size: 12px;
-    }
-}
-.statistics-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.statistics-controls label {
-    font-weight: 600;
-}
-
-.statistics-controls input {
-    padding: 9px 12px;
-    border: 1px solid #e5a9bf;
-    border-radius: 8px;
-    background: #fff;
-}
-
-.statistics-summary {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin: 20px 0;
-}
-
-.stat-box {
-    background: #fff5f8;
-    border: 1px solid #f1c4d4;
-    border-radius: 12px;
-    padding: 18px;
-    text-align: center;
-}
-
-.stat-box h3 {
-    margin: 0 0 8px;
-    color: #c94f7c;
-    font-size: 16px;
-}
-
-.stat-box p {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.statistics-table-wrapper {
-    overflow-x: auto;
-    margin: 12px 0 25px;
-}
-
-.statistics-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-.statistics-table th {
-    background: #f7b6cf;
-    color: #7d3151;
-    padding: 11px;
-    text-align: left;
-}
-
-.statistics-table td {
-    padding: 11px;
-    border-bottom: 1px solid #f1d6df;
-}
-
-.statistics-table tr:last-child td {
-    border-bottom: none;
-}
-
-#monthlyStatistics > h3 {
-    margin-top: 25px;
-    margin-bottom: 10px;
-    color: #c94f7c;
-}
-
-@media (max-width: 600px) {
-
-    .statistics-summary {
-        grid-template-columns: 1fr;
-    }
-
-    .statistics-controls {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F2 Expense Split</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<button id="menuButton" class="menu-button">☰</button>
+
+<aside id="sidebar" class="sidebar">
+
+    <div class="sidebar-header">
+        <h2>F2 Expense Split</h2>
+        <button id="closeSidebar" class="close-button">×</button>
+    </div>
+
+    <nav>
+        <a href="#people">👥 People</a>
+        <a href="#payments">💳 Actual Payments</a>
+        <a href="#add-expense">➕ Add Expense</a>
+        <a href="#expense-details">📋 Expense Details</a>
+        <a href="#final-balance">💰 Final Balance</a>
+        <a href="#reminders">🔔 Payback Reminders</a>
+        <a href="#statistics">📊 Monthly Statistics</a>
+    </nav>
+
+</aside>
+
+<main>
+
+    <header>
+        <h1>F2 Expense Split</h1>
+        <p>Shared Expense Manager</p>
+    </header>
+
+    <section id="people" class="card">
+        <h2>People</h2>
+
+        <div class="people-grid">
+            <input type="text" class="member-name" placeholder="Person 1">
+            <input type="text" class="member-name" placeholder="Person 2">
+            <input type="text" class="member-name" placeholder="Person 3">
+            <input type="text" class="member-name" placeholder="Person 4">
+            <input type="text" class="member-name" placeholder="Person 5">
+            <input type="text" class="member-name" placeholder="Person 6">
+        </div>
+    </section>
+
+    <section id="payments" class="card">
+        <div class="section-title">
+    <h2>Actual Payments</h2>
+    <button id="clearPayments" class="clear-all-btn">Clear All</button>
+</div>
+
+        <label>Paid By</label>
+        <select id="paidBy"></select>
+
+        <label>Category</label>
+        <select id="paymentCategory">
+            <option value="">Select Category</option>
+            <option value="Grocery">Grocery</option>
+            <option value="Food">Food</option>
+            <option value="Taxi">Taxi</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Hospital">Hospital</option>
+            <option value="Pharmacy">Pharmacy</option>
+            <option value="WiFi">WiFi</option>
+            <option value="Water">Water</option>
+            <option value="Gas">Gas</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label>Amount (AED)</label>
+        <input
+            type="number"
+            id="paymentAmount"
+            placeholder="Example: 60"
+            step="0.01"
+            min="0"
+        >
+
+        <button id="addPayment">Add Payment</button>
+        
+
+        <div id="paymentList"></div>
+    </section>
+
+    <section id="add-expense" class="card">
+        <h2>Add Expense</h2>
+
+        <label>Expense Type</label>
+        <select id="expenseType">
+            <option value="">Select Type</option>
+            <option value="Grocery">Grocery</option>
+            <option value="Food">Food</option>
+            <option value="Taxi">Taxi</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Hospital">Hospital</option>
+            <option value="Pharmacy">Pharmacy</option>
+            <option value="WiFi">WiFi</option>
+            <option value="Water">Water</option>
+            <option value="Gas">Gas</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label>Item / Description</label>
+        <input
+            type="text"
+            id="expenseDescription"
+            placeholder="Example: Noodles"
+        >
+
+        <label>Total Amount (AED)</label>
+        <input
+            type="number"
+            id="expenseAmount"
+            placeholder="Example: 14"
+            step="0.01"
+            min="0"
+        >
+
+        <label>Who Should Share This Expense?</label>
+
+        <div class="expense-members">
+
+            <label class="member-checkbox">
+                <input type="checkbox" class="expense-member" value="0">
+                <span id="expenseMember0">Person 1</span>
+            </label>
+
+            <label class="member-checkbox">
+                <input type="checkbox" class="expense-member" value="1">
+                <span id="expenseMember1">Person 2</span>
+            </label>
+
+            <label class="member-checkbox">
+                <input type="checkbox" class="expense-member" value="2">
+                <span id="expenseMember2">Person 3</span>
+            </label>
+
+            <label class="member-checkbox">
+                <input type="checkbox" class="expense-member" value="3">
+                <span id="expenseMember3">Person 4</span>
+            </label>
+
+            <label class="member-checkbox">
+                <input type="checkbox" class="expense-member" value="4">
+                <span id="expenseMember4">Person 5</span>
+            </label>
+
+            <label class="member-checkbox">
+                <input type="checkbox" class="expense-member" value="5">
+                <span id="expenseMember5">Person 6</span>
+            </label>
+
+        </div>
+
+        <button id="addExpense">Add Expense</button>
+    </section>
+
+    <section id="expense-details" class="card">
+        <div class="section-title">
+    <h2>Expense Details</h2>
+    <button id="clearExpenses" class="clear-all-btn">Clear All</button>
+</div>
+        <div id="expenseSections"></div>
+    </section>
+
+    <section id="final-balance" class="card">
+        <h2>Final Balance</h2>
+        <div id="balanceList"></div>
+    </section>
+
+    <section id="reminders" class="card">
+        <div class="section-title">
+    <h2>Payback Reminders</h2>
+    <button id="clearPaybacks" class="clear-all-btn">Clear All</button>
+</div>
+        <div id="reminderList">
+            No pending reminders yet.
+        </div>
+    </section>
+
+    <section id="statistics" class="card">
+
+    <h2>Monthly Statistics</h2>
+
+    <div class="statistics-controls">
+
+        <label for="statisticsMonth">
+            Select Month
+        </label>
+
+        <input
+            type="month"
+            id="statisticsMonth"
+        >
+
+    </div>
+
+    <div id="monthlyStatistics">
+
+        <div class="category-empty">
+            Select a month to view statistics.
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
