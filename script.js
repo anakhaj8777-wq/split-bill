@@ -157,11 +157,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     displayPayments();
     calculateBalances();
 });
+
 function setupMemberInputs() {
     const inputs =
         document.querySelectorAll(".member-name");
 
-    inputs.forEach(function (input) {
+    inputs.forEach(function (input, index) {
         input.addEventListener("input", function () {
             updateMembers();
             updateExpenseMembers();
@@ -169,6 +170,33 @@ function setupMemberInputs() {
             displayExpenses();
             displayPayments();
             calculateBalances();
+        });
+
+        input.addEventListener("change", async function () {
+            const member = memberRecords[index];
+
+            if (!member) return;
+
+            const newName = input.value.trim();
+
+            if (!newName) return;
+
+            const { error } = await db
+                .from("members")
+                .update({
+                    name: newName
+                })
+                .eq("id", member.id)
+                .eq("room_id", ROOM_ID);
+
+            if (error) {
+                console.error("Error saving member name:", error);
+            } else {
+                member.name = newName;
+                members[index] = newName;
+                updateExpenseMembers();
+                updatePaymentDropdown();
+            }
         });
     });
 
@@ -179,20 +207,7 @@ function setupMemberInputs() {
     document
         .getElementById("addPayment")
         .addEventListener("click", addPayment);
-}
-
-function updateMembers() {
-    const inputs =
-        document.querySelectorAll(".member-name");
-
-    inputs.forEach(function (input, index) {
-        const name = input.value.trim();
-
-        if (name !== "") {
-            members[index] = name;
-        }
-    });
-}
+} 
 
 function updateExpenseMembers() {
     members.forEach(function (member, index) {
