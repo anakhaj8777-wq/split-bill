@@ -869,12 +869,23 @@ async function addPayment() {
     calculateBalances();
 }
 
-function deletePayment(id) {
+async function deletePayment(id) {
 
-    payments =
-        payments.filter(function (payment) {
-            return payment.id !== id;
-        });
+    const { error } = await db
+        .from("payments")
+        .delete()
+        .eq("id", id)
+        .eq("room_id", ROOM_ID);
+
+    if (error) {
+        console.error("Error deleting payment:", error);
+        alert("Payment could not be deleted.");
+        return;
+    }
+
+    payments = payments.filter(function (payment) {
+        return payment.id !== id;
+    });
 
     displayPayments();
     displayExpenses();
