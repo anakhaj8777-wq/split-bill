@@ -169,7 +169,6 @@ async function savePaybackStatus(debtorIndex, creditorIndex, category, amount, s
     const debtorId = memberRecords[debtorIndex].id;
     const creditorId = memberRecords[creditorIndex].id;
 
-    // Look for an existing payback record
     const existing = paybacks.find(function (payback) {
 
         return (
@@ -314,18 +313,22 @@ function getPaybackStatus(
     return existing.status;
 }
 document.addEventListener("DOMContentLoaded", async function () {
+
     setupMemberInputs();
 
     await loadMembersFromSupabase();
 
     await loadExpensesFromSupabase();
-    await loadPaymentsFromSupabase(); 
+    await loadPaymentsFromSupabase();
     await loadPaybacksFromSupabase();
+
     updateExpenseMembers();
     updatePaymentDropdown();
+
     displayExpenses();
     displayPayments();
     calculateBalances();
+
     setupStatistics();
 });
 
@@ -340,27 +343,38 @@ function updateMembers() {
 }
 
 function setupMemberInputs() {
+
     const inputs =
         document.querySelectorAll(".member-name");
 
     inputs.forEach(function (input, index) {
+
         input.addEventListener("input", function () {
+
             updateMembers();
             updateExpenseMembers();
             updatePaymentDropdown();
             displayExpenses();
             displayPayments();
             calculateBalances();
+
         });
 
         input.addEventListener("change", async function () {
-            const member = memberRecords[index];
 
-            if (!member) return;
+            const member =
+                memberRecords[index];
 
-            const newName = input.value.trim();
+            if (!member) {
+                return;
+            }
 
-            if (!newName) return;
+            const newName =
+                input.value.trim();
+
+            if (!newName) {
+                return;
+            }
 
             const { error } = await db
                 .from("members")
@@ -371,34 +385,76 @@ function setupMemberInputs() {
                 .eq("room_id", ROOM_ID);
 
             if (error) {
-                console.error("Error saving member name:", error);
+
+                console.error(
+                    "Error saving member name:",
+                    error
+                );
+
             } else {
+
                 member.name = newName;
                 members[index] = newName;
+
                 updateExpenseMembers();
                 updatePaymentDropdown();
+
             }
+
         });
+
     });
 
-    document
-        .getElementById("addExpense")
-        .addEventListener("click", addExpense);
+    const addExpenseButton =
+        document.getElementById("addExpense");
 
-    document
-        .getElementById("addPayment")
-        .addEventListener("click", addPayment);
-    document
-    .getElementById("clearPayments")
-    .addEventListener("click", clearAllPayments);  
-    document
-    .getElementById("clearExpenses")
-    .addEventListener("click", clearAllExpenses); 
-    document
-    .getElementById("clearPaybacks")
-    .addEventListener("click", clearAllPaybacks);
-} 
+    if (addExpenseButton) {
+        addExpenseButton.addEventListener(
+            "click",
+            addExpense
+        );
+    }
 
+    const addPaymentButton =
+        document.getElementById("addPayment");
+
+    if (addPaymentButton) {
+        addPaymentButton.addEventListener(
+            "click",
+            addPayment
+        );
+    }
+
+    const clearPaymentsButton =
+        document.getElementById("clearPayments");
+
+    if (clearPaymentsButton) {
+        clearPaymentsButton.addEventListener(
+            "click",
+            clearAllPayments
+        );
+    }
+
+    const clearExpensesButton =
+        document.getElementById("clearExpenses");
+
+    if (clearExpensesButton) {
+        clearExpensesButton.addEventListener(
+            "click",
+            clearAllExpenses
+        );
+    }
+
+    const clearPaybacksButton =
+        document.getElementById("clearPaybacks");
+
+    if (clearPaybacksButton) {
+        clearPaybacksButton.addEventListener(
+            "click",
+            clearAllPaybacks
+        );
+    }
+}
 function updateExpenseMembers() {
     members.forEach(function (member, index) {
         const element =
@@ -408,7 +464,7 @@ function updateExpenseMembers() {
 
         if (element) {
             element.textContent = member;
-        }
+        } 
     });
 }
 
@@ -587,11 +643,15 @@ async function clearAllExpenses() {
 }
 function displayExpenses() {
     const container =
-        document.getElementById(
-            "expenseSections"
-        );
+    document.getElementById(
+        "expenseSections"
+    );
 
-    container.innerHTML = "";
+if (!container) {
+    return;
+}
+
+container.innerHTML = "";
 
     if (expenses.length === 0) {
         container.innerHTML = `
@@ -1258,11 +1318,15 @@ async function clearAllPayments() {
 function displayPayments() {
 
     const container =
-        document.getElementById(
-            "paymentList"
-        );
+    document.getElementById(
+        "paymentList"
+    );
 
-    container.innerHTML = "";
+if (!container) {
+    return;
+}
+
+container.innerHTML = "";
 
     if (payments.length === 0) {
         container.innerHTML = `
@@ -1622,6 +1686,7 @@ function calculateBalances() {
         actuallyPaid,
         balances
     );
+    calculateOverallSettlement();
 }
 
 function displayFinalBalances(
@@ -1631,11 +1696,15 @@ function displayFinalBalances(
 ) {
 
     const container =
-        document.getElementById(
-            "balanceList"
-        );
+    document.getElementById(
+        "balanceList"
+    );
 
-    container.innerHTML = "";
+if (!container) {
+    return;
+}
+
+container.innerHTML = "";
 
     members.forEach(function (member, index) {
 
@@ -1695,20 +1764,277 @@ function displayFinalBalances(
         container.appendChild(row);
     });
 }
-const menuButton = document.getElementById("menuButton");
-const sidebar = document.getElementById("sidebar");
-const closeSidebar = document.getElementById("closeSidebar");
+const menuButton =
+    document.getElementById("menuButton");
 
-menuButton.addEventListener("click", function () {
-    sidebar.classList.add("open");
-});
+const sidebar =
+    document.getElementById("sidebar");
 
-closeSidebar.addEventListener("click", function () {
-    sidebar.classList.remove("open");
-});
+const closeSidebar =
+    document.getElementById("closeSidebar");
 
-document.querySelectorAll(".sidebar nav a").forEach(function (link) {
-    link.addEventListener("click", function () {
-        sidebar.classList.remove("open");
+
+if (menuButton && sidebar) {
+
+    menuButton.addEventListener(
+        "click",
+        function () {
+            sidebar.classList.add("open");
+        }
+    );
+
+}
+
+
+if (closeSidebar && sidebar) {
+
+    closeSidebar.addEventListener(
+        "click",
+        function () {
+            sidebar.classList.remove("open");
+        }
+    );
+
+}
+
+
+document
+    .querySelectorAll(".sidebar nav a")
+    .forEach(function (link) {
+        link.addEventListener(
+            "click",
+            function () {
+                if (sidebar) {
+                    sidebar.classList.remove("open");
+                }
+            }
+        );
     });
-});
+
+
+/* CLOSE SIDEBAR WHEN CLICKING OUTSIDE */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        if (!sidebar) {
+            return;
+        }
+
+        if (!sidebar.classList.contains("open")) {
+            return;
+        }
+
+        const clickedInsideSidebar =
+            sidebar.contains(event.target);
+
+        const clickedMenuButton =
+            menuButton &&
+            menuButton.contains(event.target);
+
+        if (
+            !clickedInsideSidebar &&
+            !clickedMenuButton
+        ) {
+            sidebar.classList.remove("open");
+        }
+
+    }
+);
+function calculateOverallSettlement() {
+
+    const container =
+        document.getElementById("overallSettlement");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    const shouldPay =
+        new Array(members.length).fill(0);
+
+    const actuallyPaid =
+        new Array(members.length).fill(0);
+
+
+    expenses.forEach(function (expense) {
+
+        if (
+            !expense.members ||
+            expense.members.length === 0
+        ) {
+            return;
+        }
+
+        const share =
+            Number(expense.amount) /
+            expense.members.length;
+
+        expense.members.forEach(function (index) {
+
+            shouldPay[index] += share;
+
+        });
+
+    });
+
+
+    payments.forEach(function (payment) {
+
+        if (
+            payment.paidBy >= 0 &&
+            payment.paidBy < members.length
+        ) {
+
+            actuallyPaid[payment.paidBy] +=
+                Number(payment.amount);
+
+        }
+
+    });
+
+
+    const receivers = [];
+    const debtors = [];
+
+
+    members.forEach(function (member, index) {
+
+        const balance =
+            actuallyPaid[index] -
+            shouldPay[index];
+
+
+        if (balance > 0.005) {
+
+            receivers.push({
+                index: index,
+                amount: balance
+            });
+
+        } else if (balance < -0.005) {
+
+            debtors.push({
+                index: index,
+                amount: Math.abs(balance)
+            });
+
+        }
+
+    });
+
+
+    if (
+        receivers.length === 0 &&
+        debtors.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="category-empty">
+                Everyone is settled.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    let debtorIndex = 0;
+    let receiverIndex = 0;
+    let totalSettlement = 0;
+
+
+    while (
+        debtorIndex < debtors.length &&
+        receiverIndex < receivers.length
+    ) {
+
+        const debtor =
+            debtors[debtorIndex];
+
+        const receiver =
+            receivers[receiverIndex];
+
+
+        const amount =
+            Math.min(
+                debtor.amount,
+                receiver.amount
+            );
+
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "settlement-row";
+
+
+        row.innerHTML = `
+            <strong>
+                ${members[debtor.index]}
+            </strong>
+
+            <span>→</span>
+
+            <strong>
+                ${members[receiver.index]}
+            </strong>
+
+            <span>
+                AED ${amount.toFixed(2)}
+            </span>
+        `;
+
+
+        container.appendChild(row);
+
+
+        totalSettlement += amount;
+
+
+        debtor.amount -= amount;
+        receiver.amount -= amount;
+
+
+        if (debtor.amount <= 0.005) {
+            debtorIndex++;
+        }
+
+
+        if (receiver.amount <= 0.005) {
+            receiverIndex++;
+        }
+
+    }
+
+
+    const total =
+        document.createElement("div");
+
+    total.className =
+        "settlement-total";
+
+
+    total.innerHTML = `
+        <span>
+            Total settlement
+        </span>
+
+        <span>
+            AED ${totalSettlement.toFixed(2)}
+        </span>
+    `;
+
+
+    container.appendChild(total);
+
+}
+
+
+
+    
+   
