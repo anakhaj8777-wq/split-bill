@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People - F2 Expense Split</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<button id="menuButton" class="menu-button">☰</button>
+
+<aside id="sidebar" class="sidebar">
+
+    <div class="sidebar-header">
+        <h2>F2 Expense Split</h2>
+        <button id="closeSidebar" class="close-button">×</button>
+    </div>
+
+    <nav>
+        <a href="people.html">👥 People</a>
+        <a href="payments.html">💳 Actual Payments</a>
+        <a href="expenses.html">➕ Add Expense</a>
+        <a href="details.html">📋 Expense Details</a>
+        <a href="balance.html">💰 Final Balance</a>
+        <a href="statistics.html">📊 Monthly Statistics</a>
+    </nav>
+
+</aside>
+
+<main>
+
+    <header>
+        <h1>F2 Expense Split</h1>
+        <p>Shared Expense Manager</p>
+    </header>
+
+    <section class="card">
+
+        <h2>People</h2>
+
+        <div class="people-grid">
+
+            <input type="text" class="member-name" placeholder="Person 1">
+            <input type="text" class="member-name" placeholder="Person 2">
+            <input type="text" class="member-name" placeholder="Person 3">
+            <input type="text" class="member-name" placeholder="Person 4">
+            <input type="text" class="member-name" placeholder="Person 5">
+            <input type="text" class="member-name" placeholder="Person 6">
+
+        </div>
+
+    </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
