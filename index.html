@@ -1,10 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>F2 Expense Split</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        .home-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+            min-height: 360px;
+        }
+
+        .home-text {
+            padding: 10px;
+        }
+
+        .home-text h2 {
+            font-size: 34px;
+            margin-bottom: 15px;
+        }
+
+        .home-text .welcome-text {
+            font-size: 18px;
+            line-height: 1.7;
+            color: #666;
+        }
+
+        .home-tag {
+            display: inline-block;
+            background: #ffe1ec;
+            color: #c94f7c;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .home-illustration {
+            min-height: 300px;
+            border-radius: 25px;
+            background: linear-gradient(
+                135deg,
+                #ffe8f0,
+                #fff5f8
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .room-illustration {
+            font-size: 90px;
+            line-height: 1.5;
+        }
+
+        .room-illustration p {
+            font-size: 18px;
+            color: #c94f7c;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .feature-card {
+            background: #fff8fb;
+            border: 1px solid #f7d4e1;
+            border-radius: 18px;
+            padding: 25px 18px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card h3 {
+            color: #c94f7c;
+            margin: 8px 0;
+        }
+
+        .feature-card p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            align-items: center;
+            text-align: center;
+        }
+
+        .step {
+            background: #fff8fb;
+            border-radius: 18px;
+            padding: 20px 10px;
+        }
+
+        .step-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .step h3 {
+            color: #c94f7c;
+            font-size: 16px;
+        }
+
+        .step p {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .step-arrow {
+            color: #d96b96;
+            font-size: 25px;
+        }
+
+        .home-footer {
+            text-align: center;
+            padding: 15px;
+            color: #c94f7c;
+            font-weight: bold;
+            font-size: 17px;
+        }
+
+        @media (max-width: 800px) {
+
+            .home-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .step-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .home-text h2 {
+                font-size: 27px;
+            }
+
+            .room-illustration {
+                font-size: 65px;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
@@ -14,208 +192,316 @@
 <aside id="sidebar" class="sidebar">
 
     <div class="sidebar-header">
+
         <h2>F2 Expense Split</h2>
-        <button id="closeSidebar" class="close-button">×</button>
+
+        <button id="closeSidebar" class="close-button">
+            ×
+        </button>
+
     </div>
 
     <nav>
-        <a href="#people">👥 People</a>
-        <a href="#payments">💳 Actual Payments</a>
-        <a href="#add-expense">➕ Add Expense</a>
-        <a href="#expense-details">📋 Expense Details</a>
-        <a href="#final-balance">💰 Final Balance</a>
-        <a href="#reminders">🔔 Payback Reminders</a>
-        <a href="#statistics">📊 Monthly Statistics</a>
+
+        <a href="people.html">
+            👥 People
+        </a>
+
+        <a href="payments.html">
+            💳 Actual Payments
+        </a>
+
+        <a href="expenses.html">
+            ➕ Add Expense
+        </a>
+
+        <a href="details.html">
+            📋 Expense Details
+        </a>
+
+        <a href="balance.html">
+            💰 Final Balance
+        </a>
+
+        <a href="statistics.html">
+            📊 Monthly Statistics
+        </a>
+
     </nav>
 
 </aside>
 
+
 <main>
 
     <header>
-        <h1>F2 Expense Split</h1>
-        <p>Shared Expense Manager</p>
+
+        <h1>
+            F2 Expense Split
+        </h1>
+
+        <p>
+            Shared Expense Manager
+        </p>
+
     </header>
 
-    <section id="people" class="card">
-        <h2>People</h2>
 
-        <div class="people-grid">
-            <input type="text" class="member-name" placeholder="Person 1">
-            <input type="text" class="member-name" placeholder="Person 2">
-            <input type="text" class="member-name" placeholder="Person 3">
-            <input type="text" class="member-name" placeholder="Person 4">
-            <input type="text" class="member-name" placeholder="Person 5">
-            <input type="text" class="member-name" placeholder="Person 6">
-        </div>
-    </section>
+    <!-- HERO SECTION -->
 
-    <section id="payments" class="card">
-        <div class="section-title">
-    <h2>Actual Payments</h2>
-    <button id="clearPayments" class="clear-all-btn">Clear All</button>
-</div>
+    <section class="card">
 
-        <label>Paid By</label>
-        <select id="paidBy"></select>
+        <div class="home-hero">
 
-        <label>Category</label>
-        <select id="paymentCategory">
-            <option value="">Select Category</option>
-            <option value="Grocery">Grocery</option>
-            <option value="Food">Food</option>
-            <option value="Taxi">Taxi</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Hospital">Hospital</option>
-            <option value="Pharmacy">Pharmacy</option>
-            <option value="WiFi">WiFi</option>
-            <option value="Water">Water</option>
-            <option value="Gas">Gas</option>
-            <option value="Other">Other</option>
-        </select>
+            <div class="home-text">
 
-        <label>Amount (AED)</label>
-        <input
-            type="number"
-            id="paymentAmount"
-            placeholder="Example: 60"
-            step="0.01"
-            min="0"
-        >
+                <div class="home-tag">
+                    🌸 Our Shared Space
+                </div>
 
-        <button id="addPayment">Add Payment</button>
-        
+                <h2>
+                    Welcome to Our Girls' Room 💕
+                </h2>
 
-        <div id="paymentList"></div>
-    </section>
+                <p class="welcome-text">
 
-    <section id="add-expense" class="card">
-        <h2>Add Expense</h2>
+                    Living together, sharing expenses,
+                    cooking together and making memories
+                    together.
 
-        <label>Expense Type</label>
-        <select id="expenseType">
-            <option value="">Select Type</option>
-            <option value="Grocery">Grocery</option>
-            <option value="Food">Food</option>
-            <option value="Taxi">Taxi</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Hospital">Hospital</option>
-            <option value="Pharmacy">Pharmacy</option>
-            <option value="WiFi">WiFi</option>
-            <option value="Water">Water</option>
-            <option value="Gas">Gas</option>
-            <option value="Other">Other</option>
-        </select>
+                    <br><br>
 
-        <label>Item / Description</label>
-        <input
-            type="text"
-            id="expenseDescription"
-            placeholder="Example: Noodles"
-        >
+                    F2 Expense Split helps us keep our
+                    shared expenses simple, clear and organized.
 
-        <label>Total Amount (AED)</label>
-        <input
-            type="number"
-            id="expenseAmount"
-            placeholder="Example: 14"
-            step="0.01"
-            min="0"
-        >
+                </p>
 
-        <label>Who Should Share This Expense?</label>
+            </div>
 
-        <div class="expense-members">
 
-            <label class="member-checkbox">
-                <input type="checkbox" class="expense-member" value="0">
-                <span id="expenseMember0">Person 1</span>
-            </label>
+            <div class="home-illustration">
 
-            <label class="member-checkbox">
-                <input type="checkbox" class="expense-member" value="1">
-                <span id="expenseMember1">Person 2</span>
-            </label>
+                <div class="room-illustration">
 
-            <label class="member-checkbox">
-                <input type="checkbox" class="expense-member" value="2">
-                <span id="expenseMember2">Person 3</span>
-            </label>
+                    👩🏻‍🦰 👩🏻‍🦱 👩🏻‍🦳
+                    <br>
 
-            <label class="member-checkbox">
-                <input type="checkbox" class="expense-member" value="3">
-                <span id="expenseMember3">Person 4</span>
-            </label>
+                    🏠 💕 🛒
 
-            <label class="member-checkbox">
-                <input type="checkbox" class="expense-member" value="4">
-                <span id="expenseMember4">Person 5</span>
-            </label>
+                    <p>
+                        Together we share,
+                        together we manage.
+                    </p>
 
-            <label class="member-checkbox">
-                <input type="checkbox" class="expense-member" value="5">
-                <span id="expenseMember5">Person 6</span>
-            </label>
+                </div>
+
+            </div>
 
         </div>
 
-        <button id="addExpense">Add Expense</button>
     </section>
 
-    <section id="expense-details" class="card">
-        <div class="section-title">
-    <h2>Expense Details</h2>
-    <button id="clearExpenses" class="clear-all-btn">Clear All</button>
-</div>
-        <div id="expenseSections"></div>
-    </section>
 
-    <section id="final-balance" class="card">
-        <h2>Final Balance</h2>
-        <div id="balanceList"></div>
-    </section>
+    <!-- FEATURES -->
 
-    <section id="reminders" class="card">
-        <div class="section-title">
-    <h2>Payback Reminders</h2>
-    <button id="clearPaybacks" class="clear-all-btn">Clear All</button>
-</div>
-        <div id="reminderList">
-            No pending reminders yet.
+    <section class="card">
+
+        <h2>
+            💗 Everything We Need
+        </h2>
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    👭
+                </div>
+
+                <h3>
+                    Our People
+                </h3>
+
+                <p>
+                    Manage everyone in our shared room.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    🛒
+                </div>
+
+                <h3>
+                    Our Expenses
+                </h3>
+
+                <p>
+                    Add groceries, food, taxi and other expenses.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    💳
+                </div>
+
+                <h3>
+                    Our Payments
+                </h3>
+
+                <p>
+                    Keep track of who actually paid.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    💰
+                </div>
+
+                <h3>
+                    Our Balance
+                </h3>
+
+                <p>
+                    See who needs to pay whom.
+                </p>
+
+            </div>
+
         </div>
+
     </section>
 
-    <section id="statistics" class="card">
 
-    <h2>Monthly Statistics</h2>
+    <!-- HOW IT WORKS -->
 
-    <div class="statistics-controls">
+    <section class="card">
 
-        <label for="statisticsMonth">
-            Select Month
-        </label>
+        <h2>
+            ✨ How F2 Works
+        </h2>
 
-        <input
-            type="month"
-            id="statisticsMonth"
-        >
+        <div class="steps">
 
-    </div>
+            <div class="step">
 
-    <div id="monthlyStatistics">
+                <div class="step-icon">
+                    👭
+                </div>
 
-        <div class="category-empty">
-            Select a month to view statistics.
+                <h3>
+                    Add People
+                </h3>
+
+                <p>
+                    Add everyone in our room.
+                </p>
+
+            </div>
+
+
+            <div class="step-arrow">
+                →
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-icon">
+                    🛒
+                </div>
+
+                <h3>
+                    Add Expense
+                </h3>
+
+                <p>
+                    Record what we bought.
+                </p>
+
+            </div>
+
+
+            <div class="step-arrow">
+                →
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-icon">
+                    💳
+                </div>
+
+                <h3>
+                    Record Payment
+                </h3>
+
+                <p>
+                    Enter who paid the bill.
+                </p>
+
+            </div>
+
+
+            <div class="step-arrow">
+                →
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-icon">
+                    💰
+                </div>
+
+                <h3>
+                    Settle
+                </h3>
+
+                <p>
+                    See the final balance.
+                </p>
+
+            </div>
+
         </div>
 
-    </div>
+    </section>
 
-</section>
+
+    <!-- FOOTER MESSAGE -->
+
+    <section class="card">
+
+        <div class="home-footer">
+
+            💕 Together we share the room,
+            the expenses & the responsibility. 💕
+
+        </div>
+
+    </section>
+
 
 </main>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="script.js"></script>
 
 </body>
+
 </html>
